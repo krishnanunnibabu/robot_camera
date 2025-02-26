@@ -2,29 +2,6 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import CompressedImage
 import cv2
-import numpy as np
-
-class CameraPublisher(Node):
-    def __init__(self):
-        super().__init__('camera_publisher')
-        self.publisher_ = self.create_publisher(CompressedImage, 'camera_feed/compressed', 10)
-
-        # Open the camera
-        self.cap = cv2.VideoCapture(0)
-
-        # Force a lower resolution
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-
-        if not self.cap.isOpened():
-            self.get_logger().error("❌ Could not open camera")
-            return
-
-        self.timer = self.create_timer(0.1, self.publish_frame)  # Publish at 10Hz
-import rclpy
-from rclpy.node import Node
-from sensor_msgs.msg import CompressedImage
-import cv2
 
 class CameraPublisher(Node):
     def __init__(self):
@@ -32,8 +9,8 @@ class CameraPublisher(Node):
         self.publisher_ = self.create_publisher(CompressedImage, 'camera_feed/compressed', 10)
 
         self.cap = cv2.VideoCapture(0)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)   # Lower resolution
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)  # Lower resolution
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280) # Lower resolution
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720) #Lower resolution
 
         self.timer = self.create_timer(0.1, self.publish_frame)  # 10 FPS
         self.get_logger().info("📷 Camera Publisher Node Started")
@@ -46,7 +23,7 @@ class CameraPublisher(Node):
 
         try:
             # Compress image with lower JPEG quality (default ~95, set to 30)
-            encode_param = [cv2.IMWRITE_JPEG_QUALITY, 30]
+            encode_param = [cv2.IMWRITE_JPEG_QUALITY, 50]
             _, buffer = cv2.imencode('.jpg', frame, encode_param)
 
             msg = CompressedImage()
