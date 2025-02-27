@@ -14,28 +14,27 @@ class CameraSubscriber(Node):
             self.image_callback,
             10
         )
-        self.lock = threading.Lock()  # Prevents race conditions
-        self.get_logger().info("📡 Camera Subscriber Node Started")
+        self.lock = threading.Lock()  
+        self.get_logger().info("Camera Subscriber Node Started")
 
     def image_callback(self, msg):
         with self.lock:
             try:
-                # Convert compressed image back to NumPy array
-                np_arr = np.frombuffer(msg.data, np.uint8)
+                np_arr = np.frombuffer(msg.data, np.uint8) #decoding
                 frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
                 if frame is None:
-                    self.get_logger().error("❌ Failed to decode image")
+                    self.get_logger().error("Failed to decode image")
                     return
 
-                # Display frame
+                
                 cv2.imshow("Camera Feed", frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):  
-                    self.get_logger().info("🔴 Closing Camera Feed")
+                    self.get_logger().info("Closing Camera Feed")
                     rclpy.shutdown()
 
             except Exception as e:
-                self.get_logger().error(f"⚠️ Error processing image: {e}")
+                self.get_logger().error(f"Error processing image: {e}")
 
 def main(args=None):
     rclpy.init(args=args)
